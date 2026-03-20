@@ -2,19 +2,100 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>3D Model</title>
+  <title>3D Viewer</title>
+
   <style>
-    body { margin:0; background:#000; }
-    iframe { width:100%; height:100vh; border:none; }
+    body { margin:0; background:#000; font-family:sans-serif; }
+
+    .viewer-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .info-box {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255,255,255,0.95);
+      padding: 14px;
+      border-radius: 12px;
+      max-width: 260px;
+    }
   </style>
 </head>
+
 <body>
 
-<iframe 
-  title="กวนอู"
-  allowfullscreen
-  src="https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed">
-</iframe>
+<div class="viewer-container">
+
+  <iframe id="viewer"></iframe>
+
+  <div class="info-box" id="infoBox">
+    📍 กำลังโหลด...
+  </div>
+
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  const viewer = document.getElementById("viewer");
+  const infoBox = document.getElementById("infoBox");
+
+  // 🔥 รวม 9 โมเดลไว้ตรงนี้
+  const models = {
+    1: {
+      name: "วัดท่าคอย",
+      url: "https://sketchfab.com/models/9f1a53736e004dde9de2a0bc7f1ba322/embed",
+      desc: "วัดสำคัญของชุมชน"
+    },
+    2: {
+      name: "อุโบสถ",
+      url: "https://sketchfab.com/models/3e741d49aee549d78a412f086e9731c6/embed",
+      desc: "สถานที่ประกอบพิธีกรรม"
+    },
+    3: {
+      name: "ปลา",
+      url: "https://sketchfab.com/models/84bbddb8c8354cda8f019632cd7791ea/embed",
+      desc: "งานศิลปะท้องถิ่น"
+    },
+    4: {
+      name: "ตลาด",
+      url: "https://sketchfab.com/models/3acb429fbcac495dbdf60a8c773a943f/embed",
+      desc: "แหล่งค้าขายชุมชน"
+    },
+    5: {
+      name: "ทองม้วน2",
+      url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
+      desc: "ขนมพื้นบ้าน"
+    },
+    6: {
+      name: "กวนอู",
+      url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
+      desc: "เทพแห่งความซื่อสัตย์"
+    },
+    7: {
+      name: "เจ้าแม่ทับทิม",
+      url: "https://sketchfab.com/models/23d7e59a3bec4d84abca9c5a6d77f46a/embed",
+      desc: "สิ่งศักดิ์สิทธิ์ประจำชุมชน"
+    }
+  };
+
+  if (models[id]) {
+    viewer.src = models[id].url;
+    infoBox.innerHTML = "📍 " + models[id].name + "<br>" + models[id].desc;
+  } else {
+    infoBox.innerHTML = "❌ ไม่พบข้อมูล";
+  }
+</script>
 
 </body>
 </html>
