@@ -5,7 +5,11 @@
   <title>3D Viewer</title>
 
   <style>
-    body { margin:0; background:#000; font-family:sans-serif; }
+    body {
+      margin:0;
+      background:#000;
+      font-family:sans-serif;
+    }
 
     .viewer-container {
       position: relative;
@@ -19,14 +23,41 @@
       border: none;
     }
 
+    /* 🔥 กล่องข้อมูลใหม่ (ใหญ่ขึ้น) */
     .info-box {
       position: absolute;
       bottom: 20px;
       left: 20px;
       background: rgba(255,255,255,0.95);
-      padding: 14px;
-      border-radius: 12px;
-      max-width: 260px;
+      padding: 18px;
+      border-radius: 14px;
+      max-width: 350px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+
+    .info-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .info-desc {
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    /* 🔊 ปุ่ม */
+    .btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #ff5722;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -37,9 +68,12 @@
 
   <iframe id="viewer"></iframe>
 
-  <div class="info-box" id="infoBox">
-    📍 กำลังโหลด...
+  <div class="info-box">
+    <div class="info-title" id="title">กำลังโหลด...</div>
+    <div class="info-desc" id="desc"></div>
   </div>
+
+  <a class="btn" onclick="speakText()">🔊 ฟังเสียง</a>
 
 </div>
 
@@ -48,52 +82,64 @@
   const id = params.get("id");
 
   const viewer = document.getElementById("viewer");
-  const infoBox = document.getElementById("infoBox");
+  const title = document.getElementById("title");
+  const desc = document.getElementById("desc");
 
-  // 🔥 รวม 9 โมเดลไว้ตรงนี้
+  let currentText = "";
+
   const models = {
     1: {
       name: "วัดท่าคอย",
       url: "https://sketchfab.com/models/9f1a53736e004dde9de2a0bc7f1ba322/embed",
-      desc: "วัดสำคัญของชุมชน"
+      desc: "วัดท่าคอย ตั้งอยู่ในอำเภอท่ายาง จังหวัดเพชรบุรี เป็นวัดที่มีความสำคัญทางประวัติศาสตร์และเป็นศูนย์กลางของชุมชนมาอย่างยาวนาน มีการจัดกิจกรรมทางศาสนาและประเพณีต่าง ๆ อย่างต่อเนื่อง"
     },
     2: {
       name: "อุโบสถ",
       url: "https://sketchfab.com/models/3e741d49aee549d78a412f086e9731c6/embed",
-      desc: "สถานที่ประกอบพิธีกรรม"
+      desc: "อุโบสถเป็นสถานที่ประกอบพิธีกรรมทางศาสนา เช่น การบวชและการทำสังฆกรรม มีสถาปัตยกรรมที่งดงามและสะท้อนถึงศิลปวัฒนธรรมไทย"
     },
     3: {
       name: "ปลา",
       url: "https://sketchfab.com/models/84bbddb8c8354cda8f019632cd7791ea/embed",
-      desc: "งานศิลปะท้องถิ่น"
+      desc: "โมเดลปลานี้สะท้อนถึงวิถีชีวิตของชุมชนริมแม่น้ำ ซึ่งมีความผูกพันกับการประมงและทรัพยากรธรรมชาติในท้องถิ่น"
     },
     4: {
       name: "ตลาด",
       url: "https://sketchfab.com/models/3acb429fbcac495dbdf60a8c773a943f/embed",
-      desc: "แหล่งค้าขายชุมชน"
+      desc: "ตลาดชุมชนเป็นแหล่งรวมสินค้า อาหารพื้นบ้าน และวิถีชีวิตของคนในพื้นที่ เป็นจุดสำคัญในการท่องเที่ยวเชิงวัฒนธรรม"
     },
     5: {
-      name: "ทองม้วน2",
+      name: "ทองม้วน",
       url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-      desc: "ขนมพื้นบ้าน"
+      desc: "ทองม้วนเป็นขนมไทยโบราณที่มีชื่อเสียงของจังหวัดเพชรบุรี มีรสชาติหวาน หอม และเป็นเอกลักษณ์ของท้องถิ่น"
     },
     6: {
       name: "กวนอู",
       url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
-      desc: "เทพแห่งความซื่อสัตย์"
+      desc: "กวนอูเป็นเทพเจ้าที่ได้รับความเคารพในเรื่องของความซื่อสัตย์ ความกล้าหาญ และความยุติธรรม มักถูกบูชาเพื่อความเป็นสิริมงคล"
     },
     7: {
       name: "เจ้าแม่ทับทิม",
       url: "https://sketchfab.com/models/23d7e59a3bec4d84abca9c5a6d77f46a/embed",
-      desc: "สิ่งศักดิ์สิทธิ์ประจำชุมชน"
+      desc: "เจ้าแม่ทับทิมเป็นสิ่งศักดิ์สิทธิ์ที่ชาวบ้านเคารพนับถือ เชื่อกันว่าช่วยคุ้มครองผู้เดินทางและนำความโชคดีมาให้"
     }
   };
 
   if (models[id]) {
     viewer.src = models[id].url;
-    infoBox.innerHTML = "📍 " + models[id].name + "<br>" + models[id].desc;
+    title.innerText = "📍 " + models[id].name;
+    desc.innerText = models[id].desc;
+    currentText = models[id].name + " " + models[id].desc;
   } else {
-    infoBox.innerHTML = "❌ ไม่พบข้อมูล";
+    title.innerText = "ไม่พบข้อมูล";
+  }
+
+  // 🔊 เสียง
+  function speakText() {
+    const speech = new SpeechSynthesisUtterance(currentText);
+    speech.lang = "th-TH";
+    speech.rate = 0.9;
+    window.speechSynthesis.speak(speech);
   }
 </script>
 
