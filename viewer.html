@@ -1,153 +1,150 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>3D Viewer</title>
+<meta charset="UTF-8">
+<title>3D Viewer</title>
 
 <style>
-  body { margin:0; background:#000; font-family:sans-serif; }
+body {
+  margin:0;
+  background:#000;
+  font-family:sans-serif;
+}
 
-  .viewer-container {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-  }
+.viewer-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
 
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
+/* 🔥 iframe ปกติ (desktop) */
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
 
+/* 🔥 กล่องข้อมูล */
+.info-box {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  background: rgba(255,255,255,0.98);
+  padding: 26px;
+  border-radius: 20px;
+  width: 450px;
+  max-height: 45vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+  transition: 0.4s;
+}
+
+.info-box.hide {
+  transform: translateY(120%);
+  opacity: 0;
+}
+
+.info-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.info-desc {
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+/* 🔥 ปุ่ม */
+.controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  background: #ff5722;
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn.stop { background: #333; }
+.btn.toggle { background: #009688; }
+
+.show-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: #009688;
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: none;
+}
+
+/* 📱 Tablet */
+@media (max-width: 768px) {
   .info-box {
-    position: absolute;
-    bottom: 30px;
-    left: 30px;
-    background: rgba(255,255,255,0.98);
-    padding: 26px;
-    border-radius: 20px;
-    width: 450px;
-    max-height: 45vh;
-    overflow-y: auto;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-    transition: 0.4s;
-  }
-
-  .info-box.hide {
-    transform: translateY(120%);
-    opacity: 0;
-  }
-
-  .info-title {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 12px;
-  }
-
-  .info-desc {
-    font-size: 18px;
-    line-height: 1.9;
-  }
-
-  .controls {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 10px;
-  }
-
-  .btn {
-    background: #ff5722;
-    color: #fff;
-    padding: 14px 16px;
-    border-radius: 12px;
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  .btn.stop { background: #333; }
-  .btn.toggle { background: #009688; }
-
-  .show-btn {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background: #009688;
-    color: #fff;
-    padding: 12px 14px;
-    border-radius: 10px;
-    font-size: 14px;
-    cursor: pointer;
-    display: none;
-  }
-
-  @media (max-width: 768px) {
-    .info-box {
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
-      width: auto;
-      max-height: 55vh;
-    }
-  }
-
-  /* 📱 Mobile */
-@media (max-width: 480px) {
-
-  .info-box {
-    position: fixed !important;   /* 🔥 สำคัญมาก */
-    top: 0 !important;
-    bottom: auto !important;
-    left: 0 !important;
-    right: 0 !important;
-
-    width: 100% !important;
-    height: 42vh !important;
-
-    border-radius: 0 0 20px 20px !important;
-    padding: 20px !important;
-
-    background: rgba(255,255,255,0.96) !important;
-    z-index: 9999 !important;     /* 🔥 กันโดน iframe ทับ */
-  }
-
-  .info-title {
-    font-size: 22px !important;
-  }
-
-  .info-desc {
-    font-size: 18px !important;
-  }
-
-  /* ปุ่มย้ายลงล่าง */
-  .controls {
-    top: auto !important;
-    bottom: 10px !important;
-    right: 10px !important;
-    flex-direction: column;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-height: 55vh;
   }
 }
+
+/* 📱 Mobile (แก้จริง) */
 @media (max-width: 480px) {
 
+  /* 🔥 ดัน iframe ลง */
   iframe {
     position: absolute;
-    top: 40vh;              /* 🔥 ดันลง */
-    height: 60vh;           /* 🔥 เหลือพื้นที่ให้กล่อง */
+    top: 40vh;
+    height: 60vh;
   }
 
+  /* 🔥 กล่องอยู่บน */
   .info-box {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 40vh;
+
     width: 100%;
+    height: 40vh;
 
     border-radius: 0 0 20px 20px;
     padding: 20px;
+
     background: rgba(255,255,255,0.96);
     z-index: 9999;
+  }
+
+  .info-title {
+    font-size: 22px;
+  }
+
+  .info-desc {
+    font-size: 18px;
+  }
+
+  /* 🔥 ปุ่มลงล่าง */
+  .controls {
+    top: auto;
+    bottom: 10px;
+    right: 10px;
+    flex-direction: column;
+  }
+
+  .btn {
+    font-size: 16px;
   }
 }
 </style>
@@ -175,95 +172,94 @@
 </div>
 
 <script>
-  const params = new URLSearchParams(window.location.search);
-  const id = params.get("id");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
 
-  const viewer = document.getElementById("viewer");
-  const title = document.getElementById("title");
-  const desc = document.getElementById("desc");
-  const infoBox = document.getElementById("infoBox");
-  const showBtn = document.getElementById("showBtn");
+const viewer = document.getElementById("viewer");
+const title = document.getElementById("title");
+const desc = document.getElementById("desc");
+const infoBox = document.getElementById("infoBox");
+const showBtn = document.getElementById("showBtn");
 
-  let currentText = "";
+let currentText = "";
 
-  const models = {
-    1: {
-      name: "วัดท่าคอย",
-      url: "https://sketchfab.com/models/9f1a53736e004dde9de2a0bc7f1ba322/embed",
-      desc: "วัดท่าคอย เป็นวัดสำคัญในอำเภอท่ายาง จังหวัดเพชรบุรี บรรยากาศร่มรื่น เหมาะแก่การปฏิบัติธรรม และเป็นที่ตั้งของอุทยานปลา ทำให้เป็นทั้งแหล่งศาสนาและท่องเที่ยวของชุมชน"
-    },
-    2: {
-      name: "อุโบสถ 100 ปี",
-      url: "https://sketchfab.com/models/3e741d49aee549d78a412f086e9731c6/embed",
-      desc: "อุโบสถ 100 ปี เป็นโบราณสถานที่สะท้อนประวัติศาสตร์และศิลปะไทยในชุมชน ใช้ประกอบพิธีทางศาสนา และเป็นศูนย์รวมจิตใจของคนในพื้นที่"
-    },
-    3: {
-      name: "อุทยานปลาวัดท่าคอย",
-      url: "https://sketchfab.com/models/84bbddb8c8354cda8f019632cd7791ea/embed",
-      desc: "อุทยานปลาวัดท่าคอย เป็นแหล่งท่องเที่ยวเชิงธรรมชาติและวัฒนธรรม มีปลาน้ำจืดอุดมสมบูรณ์ เหมาะสำหรับพักผ่อน ให้อาหารปลา และเรียนรู้วิถีชุมชน"
-    },
-    4: {
-      name: "ตลาดเทศบาลท่ายาง",
-      url: "https://sketchfab.com/models/3acb429fbcac495dbdf60a8c773a943f/embed",
-      desc: "ตลาดเทศบาลท่ายาง เป็นแหล่งค้าขายสำคัญของชุมชน รวมอาหารและสินค้าท้องถิ่น สะท้อนวิถีชีวิตและวัฒนธรรมของชาวเพชรบุรี"
-    },
-    5: {
-      name: "ร้านผัดไท 100 ปี",
-      url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-      desc: "ร้านผัดไท 100 ปี เป็นร้านอาหารพื้นบ้านที่มีชื่อเสียงในท่ายาง โดดเด่นด้วยผัดไทสูตรดั้งเดิม รสชาติกลมกล่อม และเป็นที่นิยมของทั้งคนในพื้นที่และนักท่องเที่ยวที่มาเยือน"
-    },
-    6: {
-      name: "ร้านทองม้วนแม่เล็ก",
-      url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-      desc: "ร้านทองม้วนแม่เล็ก เป็นร้านขนมพื้นบ้านชื่อดังในท่ายาง ทำทองม้วนสูตรดั้งเดิม รสชาติหอม กรอบ เหมาะทั้งทานและเป็นของฝาก"
-    },
-    7: {
-      name: "ศาลเจ้าพ่อกวนอู",
-      url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
-      desc: "ศาลเจ้าพ่อกวนอู เป็นสถานที่ศักดิ์สิทธิ์ที่ชาวบ้านเคารพนับถือ ใช้สักการะขอพรด้านโชคลาภ การงาน และความสำเร็จ สะท้อนวัฒนธรรมจีนในชุมชน"
-    },
-    8: {
-      name: "ข้าวแช่แม่เล็กสะกิดใจ",
-      url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
-      desc: "ข้าวแช่แม่เล็กสะกิดใจ เป็นร้านอาหารพื้นบ้านชื่อดังในท่ายาง โดดเด่นด้วยข้าวแช่หอมเย็นพร้อมเครื่องเคียงแบบดั้งเดิม สะท้อนวัฒนธรรมอาหารเพชรบุรี"
-    },
-    9: {
-      name: "ศาลเจ้าแม่ทับทิม",
-      url: "https://sketchfab.com/models/23d7e59a3bec4d84abca9c5a6d77f46a/embed",
-      desc: "ศาลเจ้าแม่ทับทิม เป็นสถานที่ศักดิ์สิทธิ์ที่ชาวไทยเชื้อสายจีนเคารพนับถือ ใช้สักการะขอพรด้านความปลอดภัย โชคลาภ และความเจริญรุ่งเรือง"
-    }
-  };
-
-  if (models[id]) {
-    viewer.src = models[id].url;
-    title.innerText = "📍 " + models[id].name;
-    desc.innerText = models[id].desc;
-    currentText = models[id].name + " " + models[id].desc;
-  } else {
-    title.innerText = "ไม่พบข้อมูล";
+const models = {
+  1: {
+    name: "วัดท่าคอย",
+    url: "https://sketchfab.com/models/9f1a53736e004dde9de2a0bc7f1ba322/embed",
+    desc: "วัดท่าคอย เป็นวัดสำคัญในอำเภอท่ายาง จังหวัดเพชรบุรี บรรยากาศร่มรื่น เหมาะแก่การปฏิบัติธรรม และเป็นแหล่งท่องเที่ยวของชุมชน"
+  },
+  2: {
+    name: "อุโบสถ 100 ปี",
+    url: "https://sketchfab.com/models/3e741d49aee549d78a412f086e9731c6/embed",
+    desc: "อุโบสถโบราณสะท้อนศิลปะไทยและประวัติศาสตร์ เป็นศูนย์รวมจิตใจของชุมชน"
+  },
+  3: {
+    name: "อุทยานปลา",
+    url: "https://sketchfab.com/models/84bbddb8c8354cda8f019632cd7791ea/embed",
+    desc: "แหล่งอนุรักษ์ปลาน้ำจืด และสถานที่พักผ่อนริมแม่น้ำ"
+  },
+  4: {
+    name: "ตลาดท่ายาง",
+    url: "https://sketchfab.com/models/3acb429fbcac495dbdf60a8c773a943f/embed",
+    desc: "ศูนย์กลางค้าขายของชุมชน เต็มไปด้วยอาหารและวัฒนธรรม"
+  },
+  5: {
+    name: "ผัดไท 100 ปี",
+    url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
+    desc: "ร้านผัดไทสูตรโบราณ รสชาติเอกลักษณ์ของท่ายาง"
+  },
+  6: {
+    name: "ทองม้วนแม่เล็ก",
+    url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
+    desc: "ขนมไทยโบราณ หอม กรอบ เป็นของฝากยอดนิยม"
+  },
+  7: {
+    name: "กวนอู",
+    url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
+    desc: "เทพแห่งความซื่อสัตย์และความกล้าหาญ"
+  },
+  8: {
+    name: "ข้าวแช่",
+    url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
+    desc: "อาหารไทยโบราณ หอมเย็น เป็นเอกลักษณ์เพชรบุรี"
+  },
+  9: {
+    name: "เจ้าแม่ทับทิม",
+    url: "https://sketchfab.com/models/23d7e59a3bec4d84abca9c5a6d77f46a/embed",
+    desc: "เทพีแห่งท้องทะเล ผู้คุ้มครองการเดินทาง"
   }
+};
 
-  function speakText() {
-    window.speechSynthesis.cancel();
-    const speech = new SpeechSynthesisUtterance(currentText);
-    speech.lang = "th-TH";
-    speech.rate = 0.9;
-    window.speechSynthesis.speak(speech);
-  }
+if (models[id]) {
+  viewer.src = models[id].url;
+  title.innerText = "📍 " + models[id].name;
+  desc.innerText = models[id].desc;
+  currentText = models[id].name + " " + models[id].desc;
+} else {
+  title.innerText = "ไม่พบข้อมูล";
+}
 
-  function stopText() {
-    window.speechSynthesis.cancel();
-  }
+function speakText() {
+  window.speechSynthesis.cancel();
+  const speech = new SpeechSynthesisUtterance(currentText);
+  speech.lang = "th-TH";
+  window.speechSynthesis.speak(speech);
+}
 
-  function toggleBox() {
-    infoBox.classList.add("hide");
-    showBtn.style.display = "block";
-  }
+function stopText() {
+  window.speechSynthesis.cancel();
+}
 
-  function showBox() {
-    infoBox.classList.remove("hide");
-    showBtn.style.display = "none";
-  }
+function toggleBox() {
+  infoBox.classList.add("hide");
+  showBtn.style.display = "block";
+}
+
+function showBox() {
+  infoBox.classList.remove("hide");
+  showBtn.style.display = "none";
+}
 </script>
 
 </body>
