@@ -11,140 +11,86 @@ body {
   font-family:sans-serif;
 }
 
+/* 🔥 แก้สำคัญ: แยก layout เป็น 2 ส่วน */
 .viewer-container {
-  position: relative;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
 }
 
-/* 🔥 iframe ปกติ (desktop) */
+/* 🔥 กล่องข้อมูล (อยู่บน) */
+.info-box {
+  background: #fff;
+  padding: 18px;
+  height: 35vh;
+  overflow-y: auto;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+  z-index: 10;
+}
+
+.info-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.info-desc {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 🔥 iframe อยู่ล่าง */
+.viewer-frame {
+  flex: 1;
+}
+
 iframe {
   width: 100%;
   height: 100%;
   border: none;
 }
 
-/* 🔥 กล่องข้อมูล */
-.info-box {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  background: rgba(255,255,255,0.98);
-  padding: 26px;
-  border-radius: 20px;
-  width: 450px;
-  max-height: 45vh;
-  overflow-y: auto;
-  box-shadow: 0 12px 35px rgba(0,0,0,0.6);
-  transition: 0.4s;
-}
-
-.info-box.hide {
-  transform: translateY(120%);
-  opacity: 0;
-}
-
-.info-title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 12px;
-}
-
-.info-desc {
-  font-size: 18px;
-  line-height: 1.9;
-}
-
 /* 🔥 ปุ่ม */
 .controls {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
   display: flex;
+  flex-direction: column;
   gap: 10px;
+  z-index: 20;
 }
 
 .btn {
   background: #ff5722;
   color: #fff;
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.btn.stop { background: #333; }
-.btn.toggle { background: #009688; }
-
-.show-btn {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  background: #009688;
-  color: #fff;
-  padding: 12px 14px;
+  padding: 12px;
   border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
-  display: none;
 }
 
-/* 📱 Tablet */
-@media (max-width: 768px) {
-  .info-box {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
-    width: auto;
-    max-height: 55vh;
+.btn.stop { background:#333; }
+.btn.toggle { background:#009688; }
+
+/* 💻 Desktop */
+@media (min-width: 768px) {
+
+  .viewer-container {
+    display: block;
   }
-}
 
-/* 📱 Mobile (แก้จริง) */
-@media (max-width: 480px) {
-
-  /* 🔥 ดัน iframe ลง */
-  iframe {
+  .info-box {
     position: absolute;
-    top: 40vh;
-    height: 60vh;
+    bottom: 30px;
+    left: 30px;
+    width: 400px;
+    height: auto;
   }
 
-  /* 🔥 กล่องอยู่บน */
-  .info-box {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-
-    width: 100%;
-    height: 40vh;
-
-    border-radius: 0 0 20px 20px;
-    padding: 20px;
-
-    background: rgba(255,255,255,0.96);
-    z-index: 9999;
-  }
-
-  .info-title {
-    font-size: 22px;
-  }
-
-  .info-desc {
-    font-size: 18px;
-  }
-
-  /* 🔥 ปุ่มลงล่าง */
-  .controls {
-    top: auto;
-    bottom: 10px;
-    right: 10px;
-    flex-direction: column;
-  }
-
-  .btn {
-    font-size: 16px;
+  .viewer-frame {
+    height: 100vh;
   }
 }
 </style>
@@ -154,21 +100,22 @@ iframe {
 
 <div class="viewer-container">
 
-  <iframe id="viewer"></iframe>
-
+  <!-- 🔥 กล่องบน -->
   <div class="info-box" id="infoBox">
     <div class="info-title" id="title">กำลังโหลด...</div>
     <div class="info-desc" id="desc"></div>
   </div>
 
-  <div class="controls">
-    <div class="btn" onclick="speakText()">🔊 เล่น</div>
-    <div class="btn stop" onclick="stopText()">⏹ หยุด</div>
-    <div class="btn toggle" onclick="toggleBox()">❌ ซ่อน</div>
+  <!-- 🔥 โมเดลล่าง -->
+  <div class="viewer-frame">
+    <iframe id="viewer"></iframe>
   </div>
 
-  <div class="show-btn" id="showBtn" onclick="showBox()">📄 แสดงข้อมูล</div>
+</div>
 
+<div class="controls">
+  <div class="btn" onclick="speakText()">🔊 เล่น</div>
+  <div class="btn stop" onclick="stopText()">⏹ หยุด</div>
 </div>
 
 <script>
@@ -178,8 +125,6 @@ const id = params.get("id");
 const viewer = document.getElementById("viewer");
 const title = document.getElementById("title");
 const desc = document.getElementById("desc");
-const infoBox = document.getElementById("infoBox");
-const showBtn = document.getElementById("showBtn");
 
 let currentText = "";
 
@@ -187,47 +132,12 @@ const models = {
   1: {
     name: "วัดท่าคอย",
     url: "https://sketchfab.com/models/9f1a53736e004dde9de2a0bc7f1ba322/embed",
-    desc: "วัดท่าคอย เป็นวัดสำคัญในอำเภอท่ายาง จังหวัดเพชรบุรี บรรยากาศร่มรื่น เหมาะแก่การปฏิบัติธรรม และเป็นแหล่งท่องเที่ยวของชุมชน"
+    desc: "วัดสำคัญของอำเภอท่ายาง บรรยากาศร่มรื่น และเป็นศูนย์กลางชุมชน"
   },
   2: {
-    name: "อุโบสถ 100 ปี",
+    name: "อุโบสถ",
     url: "https://sketchfab.com/models/3e741d49aee549d78a412f086e9731c6/embed",
-    desc: "อุโบสถโบราณสะท้อนศิลปะไทยและประวัติศาสตร์ เป็นศูนย์รวมจิตใจของชุมชน"
-  },
-  3: {
-    name: "อุทยานปลา",
-    url: "https://sketchfab.com/models/84bbddb8c8354cda8f019632cd7791ea/embed",
-    desc: "แหล่งอนุรักษ์ปลาน้ำจืด และสถานที่พักผ่อนริมแม่น้ำ"
-  },
-  4: {
-    name: "ตลาดท่ายาง",
-    url: "https://sketchfab.com/models/3acb429fbcac495dbdf60a8c773a943f/embed",
-    desc: "ศูนย์กลางค้าขายของชุมชน เต็มไปด้วยอาหารและวัฒนธรรม"
-  },
-  5: {
-    name: "ผัดไท 100 ปี",
-    url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-    desc: "ร้านผัดไทสูตรโบราณ รสชาติเอกลักษณ์ของท่ายาง"
-  },
-  6: {
-    name: "ทองม้วนแม่เล็ก",
-    url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-    desc: "ขนมไทยโบราณ หอม กรอบ เป็นของฝากยอดนิยม"
-  },
-  7: {
-    name: "กวนอู",
-    url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
-    desc: "เทพแห่งความซื่อสัตย์และความกล้าหาญ"
-  },
-  8: {
-    name: "ข้าวแช่",
-    url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
-    desc: "อาหารไทยโบราณ หอมเย็น เป็นเอกลักษณ์เพชรบุรี"
-  },
-  9: {
-    name: "เจ้าแม่ทับทิม",
-    url: "https://sketchfab.com/models/23d7e59a3bec4d84abca9c5a6d77f46a/embed",
-    desc: "เทพีแห่งท้องทะเล ผู้คุ้มครองการเดินทาง"
+    desc: "สถานที่ประกอบพิธีกรรมทางศาสนา"
   }
 };
 
@@ -236,8 +146,6 @@ if (models[id]) {
   title.innerText = "📍 " + models[id].name;
   desc.innerText = models[id].desc;
   currentText = models[id].name + " " + models[id].desc;
-} else {
-  title.innerText = "ไม่พบข้อมูล";
 }
 
 function speakText() {
@@ -249,16 +157,6 @@ function speakText() {
 
 function stopText() {
   window.speechSynthesis.cancel();
-}
-
-function toggleBox() {
-  infoBox.classList.add("hide");
-  showBtn.style.display = "block";
-}
-
-function showBox() {
-  infoBox.classList.remove("hide");
-  showBtn.style.display = "none";
 }
 </script>
 
