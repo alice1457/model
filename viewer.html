@@ -24,23 +24,29 @@ iframe {
   border: none;
 }
 
-/* 🔥 กล่องข้อมูล (กลับเป็นสีขาว) */
+/* 🔥 กล่องข้อมูล (ขาว สวย อ่านง่าย) */
 .info-box {
   position: absolute;
   bottom: 30px;
   left: 30px;
-  width: 460px;              /* 🔥 ใหญ่ขึ้น */
+  width: 460px;
   max-height: 55vh;
   overflow-y: auto;
 
   padding: 26px;
   border-radius: 18px;
 
-  background: rgba(255,255,255,0.97);  /* ✅ กลับเป็นขาว */
+  background: #ffffff;
   color: #222;
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   transition: 0.4s;
+  z-index: 9999;
+}
+
+.info-box.hide {
+  transform: translateY(120%);
+  opacity: 0;
 }
 
 .info-title {
@@ -54,37 +60,67 @@ iframe {
   line-height: 1.8;
 }
 
-/* 🔘 ปุ่ม (กลับเป็นสีเดิม) */
+/* 🔘 ปุ่ม */
+.controls {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+  z-index: 9999;
+}
+
 .btn {
   color: #fff;
   padding: 12px 14px;
   border-radius: 10px;
   font-size: 14px;
   cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
-.btn:nth-child(1) { background: #ff5722; } /* 🔊 เล่น */
-.btn:nth-child(2) { background: #333; }     /* ⏹ หยุด */
-.btn:nth-child(3) { background: #009688; }  /* ❌ ซ่อน */
+.btn:hover {
+  transform: scale(1.05);
+}
 
-/* 📱 มือถือ */
+/* 🎨 สีปุ่ม */
+.btn.play { background: #ff5722; }
+.btn.stop { background: #333; }
+.btn.hide { background: #009688; }
+
+/* 📄 ปุ่มแสดง */
+.show-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: #009688;
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  display: none;
+  z-index: 9999;
+}
+
+/* 📱 Mobile */
 @media (max-width: 768px) {
 
   .info-box {
     position: fixed !important;
     top: 0 !important;
-    bottom: auto !important;
     left: 0;
     right: 0;
+    bottom: auto;
 
     width: 100%;
-    height: 42vh;              /* 🔥 ใหญ่ขึ้นอีก */
-    
+    height: 42vh;
+
     border-radius: 0 0 20px 20px;
     padding: 22px;
 
-    background: rgba(255,255,255,0.98); /* ขาวเหมือนเดิม */
-    z-index: 9999;
+    background: #ffffff;
   }
 
   .info-title {
@@ -93,67 +129,6 @@ iframe {
 
   .info-desc {
     font-size: 18px;
-  }
-
-  .controls {
-    top: auto;
-    bottom: 10px;
-    right: 10px;
-    flex-direction: column;
-  }
-}
-.btn {
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-}
-
-.btn:hover {
-  background: #ff5722;
-}
-
-.show-btn {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  background: #009688;
-  color: #fff;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  display: none;
-}
-
-/* 📱 มือถือ (สำคัญมาก) */
-@media (max-width: 768px) {
-
-  .info-box {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: auto !important;
-    left: 0;
-    right: 0;
-
-    width: 100%;
-    height: 40vh;
-
-    border-radius: 0 0 20px 20px;
-    background: rgba(0,0,0,0.7);
-
-    z-index: 9999;
-  }
-
-  .info-title {
-    font-size: 20px;
-  }
-
-  .info-desc {
-    font-size: 16px;
   }
 
   .controls {
@@ -178,9 +153,9 @@ iframe {
   </div>
 
   <div class="controls">
-    <div class="btn" onclick="speakText()">🔊</div>
-    <div class="btn" onclick="stopText()">⏹</div>
-    <div class="btn" onclick="toggleBox()">❌</div>
+    <div class="btn play" onclick="speakText()">🔊</div>
+    <div class="btn stop" onclick="stopText()">⏹</div>
+    <div class="btn hide" onclick="toggleBox()">❌</div>
   </div>
 
   <div class="show-btn" id="showBtn" onclick="showBox()">📄 แสดงข้อมูล</div>
@@ -203,47 +178,47 @@ const models = {
   1: {
     name: "วัดท่าคอย",
     url: "https://sketchfab.com/models/9f1a53736e004dde9de2a0bc7f1ba322/embed",
-    desc: "วัดท่าคอย เป็นวัดสำคัญของชุมชนท่ายาง มีบรรยากาศร่มรื่นและเป็นศูนย์รวมจิตใจของชาวบ้าน"
+    desc: "วัดสำคัญของชุมชนท่ายาง เป็นศูนย์รวมจิตใจของชาวบ้าน"
   },
   2: {
     name: "อุโบสถ 100 ปี",
     url: "https://sketchfab.com/models/3e741d49aee549d78a412f086e9731c6/embed",
-    desc: "อุโบสถเก่าแก่ที่สะท้อนศิลปะและประวัติศาสตร์ของชุมชน"
+    desc: "โบราณสถานสำคัญสะท้อนศิลปะและประวัติศาสตร์"
   },
   3: {
     name: "อุทยานปลา",
     url: "https://sketchfab.com/models/84bbddb8c8354cda8f019632cd7791ea/embed",
-    desc: "แหล่งอนุรักษ์ปลาน้ำจืดที่สำคัญของชุมชนริมแม่น้ำ"
+    desc: "แหล่งอนุรักษ์ปลาธรรมชาติของชุมชน"
   },
   4: {
     name: "ตลาดท่ายาง",
     url: "https://sketchfab.com/models/3acb429fbcac495dbdf60a8c773a943f/embed",
-    desc: "ศูนย์กลางการค้าขายและวิถีชีวิตของชุมชน"
+    desc: "ศูนย์กลางการค้าขายและวิถีชีวิต"
   },
   5: {
-    name: "ร้านผัดไท 100 ปี",
+    name: "ร้านผัดไท",
     url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-    desc: "ร้านผัดไทสูตรโบราณ รสชาติเป็นเอกลักษณ์ของท่ายาง"
+    desc: "อาหารพื้นบ้านชื่อดังของท่ายาง"
   },
   6: {
     name: "ร้านทองม้วน",
     url: "https://sketchfab.com/models/c812542e6dfc4852aade05dc1915006f/embed",
-    desc: "ขนมพื้นบ้านขึ้นชื่อของเพชรบุรี หอม กรอบ อร่อย"
+    desc: "ขนมพื้นบ้านหอมกรอบ เอกลักษณ์เพชรบุรี"
   },
   7: {
-    name: "ศาลเจ้าพ่อกวนอู",
+    name: "ศาลเจ้ากวนอู",
     url: "https://sketchfab.com/models/df13d2d497a54e0da8d7ddcdad6c09b5/embed",
-    desc: "สถานที่ศักดิ์สิทธิ์ด้านความซื่อสัตย์และความสำเร็จ"
+    desc: "เทพแห่งความซื่อสัตย์และความสำเร็จ"
   },
   8: {
     name: "ข้าวแช่",
     url: "https://sketchfab.com/models/b5f9a4276d6b41ba8969237c6b89f095/embed",
-    desc: "อาหารไทยโบราณที่เป็นเอกลักษณ์ของเพชรบุรี"
+    desc: "อาหารไทยโบราณของเพชรบุรี"
   },
   9: {
     name: "เจ้าแม่ทับทิม",
     url: "https://sketchfab.com/models/23d7e59a3bec4d84abca9c5a6d77f46a/embed",
-    desc: "เทพีแห่งท้องทะเล ผู้คุ้มครองการเดินทาง"
+    desc: "เทพีคุ้มครองการเดินทางและการค้า"
   }
 };
 
@@ -256,7 +231,7 @@ if (models[id]) {
   title.innerText = "ไม่พบข้อมูล";
 }
 
-// 🔊 เสียง
+/* 🔊 เสียง */
 function speakText() {
   window.speechSynthesis.cancel();
   const speech = new SpeechSynthesisUtterance(currentText);
@@ -268,13 +243,13 @@ function stopText() {
   window.speechSynthesis.cancel();
 }
 
-// ❌ ซ่อน
+/* ❌ ซ่อน */
 function toggleBox() {
   infoBox.classList.add("hide");
   showBtn.style.display = "block";
 }
 
-// 📄 แสดง
+/* 📄 แสดง */
 function showBox() {
   infoBox.classList.remove("hide");
   showBtn.style.display = "none";
